@@ -101,6 +101,10 @@ The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversa
 *   **Quality Metrics**: 8+ numerical scores measuring engagement and response quality.
 *   **Dynamics**: Tone, mood, and flow patterns.
 
+For a full explanation of the extraction logic and available fields, see [`metadater/prompt.md`](metadater/prompt.md) and the taxonomy in [`metadater/config.py`](metadater/config.py).
+
+> **Note**: Improving this metadata layer is a **hot area for future work**. I am actively looking for ways to make indexing better and to help important conversations surface more effectively. Feedback and wild ideas are very welcome!
+
 **Example LLM Metadata (llm_meta)**:
 ```json
 {
