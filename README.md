@@ -1,6 +1,6 @@
 # ChatGPT Wrapped 2025 - DS grade
 
-Analyze your ChatGPT history with professional-grade AI metadata extraction and generate a beautfeature rich, interactive dashboard.
+Analyze your ChatGPT history with industrial-grade LLM metadata extraction and generate a feature rich, interactive dashboard.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
