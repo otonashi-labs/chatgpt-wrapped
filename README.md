@@ -56,10 +56,10 @@ It ended up being good metadata. And once it was sorted I've realized that it's 
 
 Maybe in some near future - full agentic search thingy will be released here as well. I am currently tinkering on it. In the direction of a proper "Second Brain".
 
-If you’re into personal knowledge tooling / retrieval / evaluation / agentic search: I’d love issues, PRs, and wild ideas.
+If you’re into personal knowledge tooling / retrieval / evaluation / agentic search: I’d love issues, PRs, and wild ideas. 
 ---
 
-## 🏗️ How it Works
+## 🏗️ What's under the hood
 
 The pipeline is designed to handle thousands of conversations with high precision.
 
@@ -86,35 +86,39 @@ Splits your monolithic `conversations.json` (often hundreds of MBs) into managea
     ```
 
 ### 2. Infuse Metadata (`metadater/`)
-The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversation against a custom 10-domain taxonomy:
-*   **Command**: `python metadater/metadate.py`
-*   **LLM Metadata (llm_meta)**:
-    ```json
-    {
-      "domain": "coding", // Primary category
-      "sub_domain": "debugging", // Specific area
-      "conversation_type": "troubleshooting", // Nature of interaction
-      "user_intent": "Fixing a race condition in a Python script",
-      "request_types": ["task", "explanation"],
-      "keywords": ["race condition", "threading", "lock"], // Searchable terms
-      "entities_companies": ["OpenAI", "GitHub"],
-      "technologies": ["Python", "httpx", "asyncio"],
-      "inferred_future_relevance_score": 85, // 0-100: Value for future reference
-      "complexity_score": 70, // 0-100: Technical depth
-      "urgency_score": 40, // 0-100: Time sensitivity
-      "information_density": 90, // 0-100: Signal vs Noise
-      "depth_of_engagement": 75, // 0-100: User effort
-      "user_satisfaction_inferred": 95, // 0-100: Apparent success
-      "user_request_quality_inferred": 80, // 0-100: Prompt clarity
-      "ai_response_quality_score": 90, // 0-100: AI helpfulness
-      "serendipity_vs_power_users": 65, // 0-100: Uniqueness
-      "user_mood": "focused", // Emotional state
-      "conversation_tone": "technical", // Style of exchange
-      "conversation_flow": "iterative", // How it progressed
-      "one_line_summary": "Debugging Python asyncio race condition with threading locks",
-      "outcome_type": "task_completed"
-    }
-    ```
+The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversation against a custom 10-domain taxonomy. Each conversation is enriched with:
+*   **Classification**: Domain, sub-domain, conversation type, and request types.
+*   **Context**: User intent, specific keywords, and entity extraction.
+*   **Quality Metrics**: 8+ numerical scores measuring engagement and response quality.
+*   **Dynamics**: Tone, mood, and flow patterns.
+
+**Example LLM Metadata (llm_meta)**:
+```json
+{
+  "domain": "coding", // Primary category
+  "sub_domain": "debugging", // Specific area
+  "conversation_type": "troubleshooting", // Nature of interaction
+  "user_intent": "Fixing a race condition in a Python script",
+  "request_types": ["task", "explanation"],
+  "keywords": ["race condition", "threading", "lock"], // Searchable terms
+  "entities_companies": ["OpenAI", "GitHub"],
+  "technologies": ["Python", "httpx", "asyncio"],
+  "inferred_future_relevance_score": 85, // 0-100: Value for future reference
+  "complexity_score": 70, // 0-100: Technical depth
+  "urgency_score": 40, // 0-100: Time sensitivity
+  "information_density": 90, // 0-100: Signal vs Noise
+  "depth_of_engagement": 75, // 0-100: User effort
+  "user_satisfaction_inferred": 95, // 0-100: Apparent success
+  "user_request_quality_inferred": 80, // 0-100: Prompt clarity
+  "ai_response_quality_score": 90, // 0-100: AI helpfulness
+  "serendipity_vs_power_users": 65, // 0-100: Uniqueness
+  "user_mood": "focused", // Emotional state
+  "conversation_tone": "technical", // Style of exchange
+  "conversation_flow": "iterative", // How it progressed
+  "one_line_summary": "Debugging Python asyncio race condition with threading locks",
+  "outcome_type": "task_completed"
+}
+```
 
 ### 3. Generate Wrapped (`wrapped/`)
 Aggregates all metadata into a unified statistics engine and produces a standalone, interactive HTML dashboard using TypeScript and modern web components.
@@ -124,18 +128,7 @@ Aggregates all metadata into a unified statistics engine and produces a standalo
     cd wrapped && bun run generate
     ```
 
----
-
-## 📊 Technical Details
-
-### Metadata Fields
-Each analyzed conversation is enriched with an `llm_meta` section containing:
-*   **Classification**: Domain, sub-domain, conversation type, and request types.
-*   **Context**: User intent, specific keywords, and entity extraction.
-*   **Quality Metrics**: 8+ numerical scores measuring engagement and response quality.
-*   **Dynamics**: Tone, mood, and flow patterns.
-
-### Pipeline Performance
+### 4. Performance & Cost
 *   **Gemini 3 Flash**: Chosen for its massive 1M token context window and low cost.
 *   **Concurrency**: Optimized for speed with parallel async requests. A concurrency of 10 can process approximately 100 conversations every 1-2 minutes.
 *   **Cost Estimate**: Processing ~1,500 conversations typically costs between $5-7 USD via OpenRouter. 
