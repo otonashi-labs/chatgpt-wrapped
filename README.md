@@ -2,6 +2,9 @@
 
 Analyze your ChatGPT history **locally** with industrial-grade LLM metadata extraction and generate a feature rich, interactive dashboard. The pipeline leaves you with a rich metadata layer for every conversation, ready for your own experiments or search engines. 
 
+✨ **[Explore the Interactive Example Dashboard (Obfuscated)](wrapped_example.html)** ✨  
+*(Note: The data in this example has been fully obfuscated for privacy purposes, reflecting a persona of an AI researcher and engineering enthusiast).*
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Frontend](https://img.shields.io/badge/frontend-Bun%2BTypeScript-green.svg)
