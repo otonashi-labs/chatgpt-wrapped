@@ -2,8 +2,6 @@
 
 Analyze your ChatGPT history **locally** with industrial-grade LLM metadata extraction and generate a feature rich, interactive dashboard. The pipeline leaves you with a rich metadata layer for every conversation, ready for your own experiments or search engines. 
 
-An obfuscated [example dashboard](wrapped_example.html) is included in the repository. Note that GitHub does not render HTML files directly; for the full interactive experience, it is recommended to view it locally.
-
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Frontend](https://img.shields.io/badge/frontend-Bun%2BTypeScript-green.svg)
@@ -50,6 +48,8 @@ And more!
         ```
         Then open `http://localhost:9876`.
 
+
+An obfuscated [example dashboard](wrapped_example.html) is included in the repository. Note that GitHub does not render HTML files directly; for the full interactive experience, it is recommended to view it locally.
 ---
 
 🤖 **AI Coding Agent?** Check out [`AI_README.md`](AI_README.md) for a technical guide on how to navigate and customize this repository.
