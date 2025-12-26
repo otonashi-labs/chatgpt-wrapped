@@ -19,8 +19,12 @@ And more!
 > **Note**: This implementation currently supports **OpenRouter** only for metadata extraction.  
 > **Note**: The pipeline handles **all your history since launch (May 2023)**, automatically generating multi-year heatmaps and timelines.  
 
-1.  **Export Data**: Go to ChatGPT Settings → Data Controls → Export Data. You'll receive an email with a zip file with images, voices and a lot of stuff there. You need to locate `conversations.json`
-2.  **Prepare Folder**: Place the extracted `conversations.json` into `data/conversations/`.
+1.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/otonashi-labs/chatgpt-wrapped.git
+    cd chatgpt-wrapped
+    ```
+2.  **Export Data**: Go to ChatGPT Settings → Data Controls → Export Data. You'll receive an email with a zip file. Locate `conversations.json` inside and place it into `data/conversations/`.
 3.  **Configure AI**: Copy `env.example` to `.env` and add your [OpenRouter API Key](https://openrouter.ai/keys).
 4.  **Install Dependencies**:
     ```bash
@@ -34,8 +38,7 @@ And more!
     ```bash
     python run.py --concurrency 10
     ```
-    *(Concurrency of 10 processes towards LLM calls ~100 chats in 1-2 minutes)*  
-    *Though you can try go with more*  
+    *(Concurrency of 10 processes towards LLM calls ~100 chats in 1-2 minutes. Feel free to increase if your rate limits allow.)*  
 6.  **View Dashboard**:
     *   Open `wrapped/wrapped.html` directly in your browser.
     *   **Or** run a local dev server for live viewing:
