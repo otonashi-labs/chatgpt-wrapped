@@ -174,7 +174,7 @@ Aggregates all metadata into a unified statistics engine and produces a feature-
 *   **Protected**: The `.gitignore` is pre-configured to ensure no JSON exports or `.env` files are ever committed.
 
 
-## 📝 Notes
+## 📝 Notes & Discussion
 
 *  Gemini 3 Flash seems to treat GPT-4o with slight arrogance. This is seen by weirdly lower costs for 4o. Or it's just the LLM models progress. 
 *  More to come...
