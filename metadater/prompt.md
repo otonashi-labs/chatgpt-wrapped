@@ -312,7 +312,7 @@ How did the conversation progress?
 - Topic tags = abstract themes/categories for clustering
 
 **Example:**
-- Keywords: `["Porsche", "911", "GT3", "PDK", "manual transmission"]`
+- Keywords: `["Transformer", "H100", "RLHF", "distributed training", "GPU cluster"]`
 - Topic tags: `["sports_cars", "buying_decision", "performance"]`
 
 ---
