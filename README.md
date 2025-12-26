@@ -1,6 +1,6 @@
 # ChatGPT Wrapped: DS grade
 
-Analyze your ChatGPT history **locally** with industrial-grade LLM metadata extraction and generate a feature rich, interactive dashboard.
+Analyze your ChatGPT history **locally** with industrial-grade LLM metadata extraction and generate a feature rich, interactive dashboard. The pipeline leaves you with a rich metadata layer for every conversation, ready for your own experiments or search engines. 
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
