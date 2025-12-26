@@ -50,6 +50,7 @@ And more!
 
 
 An obfuscated [example dashboard](wrapped_example.html) is included in the repository. Note that GitHub does not render HTML files directly; for the full interactive experience, it is recommended to view it locally.
+
 ---
 
 🤖 **AI Coding Agent?** Check out [`AI_README.md`](AI_README.md) for a technical guide on how to navigate and customize this repository.
