@@ -58,7 +58,7 @@ For a good search you need to build the metadata layer over chats. I've decided 
 1) deterministic -[`unroll/`](unroll/) module
 2) LLM infused - [`metadater/prompt.md`](metadater/prompt.md) & Gemini 3 Flash 
 
-It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest. 
+Once the metadata has been obtained - I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest. 
 
 Maybe in some near future - full agentic search thingy will be released here as well. I am currently tinkering on it. In the direction of a proper "Second Brain".
 
