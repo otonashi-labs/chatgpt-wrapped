@@ -1,0 +1,18 @@
+{
+  "name": "chatgpt-wrapped-3",
+  "version": "1.0.0",
+  "description": "ChatGPT Wrapped 2025 - Comprehensive Statistics Visualization",
+  "type": "module",
+  "scripts": {
+    "aggregate": "python3 aggregate.py",
+    "generate": "bun run src/generate.ts",
+    "serve": "bun run src/server.ts",
+    "build": "python3 aggregate.py && bun run src/generate.ts",
+    "dev": "bun run --watch src/server.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
+

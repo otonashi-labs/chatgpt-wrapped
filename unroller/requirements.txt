@@ -1,0 +1,6 @@
+# ChatGPT Unroller
+# No external dependencies - uses only Python stdlib
+
+# Optional: for accurate token counting
+# tiktoken>=0.5.0
+

@@ -1,0 +1,30 @@
+# Data files
+data/conversations/*
+!data/conversations/.gitkeep
+data/unrolled/*
+!data/unrolled/.gitkeep
+data/wmeta/*
+!data/wmeta/.gitkeep
+data/stats/*
+!data/stats/.gitkeep
+
+# Environment secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
+venv/
+ENV/
+
+# Node.js
+node_modules/
+dist/
+.npm
+
+# OS files
+.DS_Store
+Thumbs.db
+
