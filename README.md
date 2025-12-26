@@ -55,7 +55,7 @@ So it's always been a struggle to find something in ChatGPT chats.
 Imagine you need a formula from research you have done months ago. Or banger GTM idea you have written to chat at 2 am random Thursday. You know that it is there, but oh man it takes time and grind to find it. Especially if you have thousands of chats. That is why an idea of building a good search over the chats has been around with me; you know - proper SOTA agentic search. 
 
 For a good search you need to build the metadata layer over chats. I've decided to do it two fold:
-1) deterministic - unroll/ module
+1) deterministic -[`unroll/`](unroll/) module
 2) LLM infused - [`metadater/prompt.md`](metadater/prompt.md) & Gemini 3 Flash 
 
 It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest. 
