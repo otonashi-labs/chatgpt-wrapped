@@ -23,7 +23,7 @@ Analyze your ChatGPT history with industrial-grade LLM metadata extraction and g
     ```bash
     python run.py --concurrency 10
     ```
-    *(Concurrency of 10 processes ~100 chats in 1-2 minutes)*
+    *(Concurrency of 10 processes towards LLM calls ~100 chats in 1-2 minutes)*
 6.  **View Dashboard**:
     *   Open `wrapped/wrapped.html` directly in your browser.
     *   **Or** run a local dev server for live viewing:
