@@ -16,7 +16,8 @@ And more!
 
 ## 🚀 Quick Start
 
-> **Note**: This implementation currently supports **OpenRouter** only for metadata extraction.  
+> **Note**: This implementation currently supports **OpenRouter** only for metadata extraction.   
+
 > **Note**: The pipeline handles **all your history since launch (May 2023)**, automatically generating multi-year heatmaps and timelines.  
 
 1.  **Clone the Repository**:
