@@ -12,7 +12,7 @@ Analyze your ChatGPT history **locally** with industrial-grade LLM metadata extr
 
 ![Roko](images/roko.png)
 
-And Many more!
+And more!
 
 ## 🚀 Quick Start
 
@@ -138,14 +138,12 @@ Aggregates all metadata into a unified statistics engine and produces a standalo
     cd wrapped && bun run generate
     ```
 
-## Performance & Cost
+### Performance & Cost
 *   **Gemini 3 Flash**: Chosen for its massive 1M token context window and low cost.
 *   **Concurrency**: Optimized for speed with parallel async requests. A concurrency of 10 can process approximately 100 conversations every 1-2 minutes.
 *   **Cost Estimate**: Processing ~1,500 conversations typically costs between $5-7 USD via OpenRouter. 
 
----
-
-## 🛡️ Privacy First
+### 🛡️ Privacy First
 
 *   **Local Processing**: Your raw data never leaves your machine except for the metadata extraction request sent to the LLM.
 *   **No Tracking**: This tool has no analytics or external reporting.
