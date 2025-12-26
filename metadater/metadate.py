@@ -209,6 +209,7 @@ def main():
             continue
         
         # Process
+        print(f"  → [{i+1}/{len(conversations)}] Processing: {conv_path.name}...", end="\r")
         result = process_file(conv_path, output_path, client, args.dry_run)
         
         if result["status"] == "success":
@@ -217,7 +218,7 @@ def main():
             stats["total_tokens"] += usage.get("total_tokens", 0)
             
             relevance = result.get("relevance", 0)
-            print(f"  ✓ [{i+1}/{len(conversations)}] {result['title'][:50]} [rel:{relevance}]")
+            print(f"  ✓ [{i+1}/{len(conversations)}] {result['title'][:50]} [rel:{relevance}]" + " " * 20)
             
         elif result["status"] == "error":
             stats["errors"] += 1

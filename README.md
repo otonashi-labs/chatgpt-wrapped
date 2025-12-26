@@ -1,6 +1,6 @@
-# ChatGPT Wrapped 2025 Wrapped
+# ChatGPT Wrapped 2025 - DS grade
 
-Analyze your ChatGPT history with professional-grade AI metadata extraction and generate a beautiful, interactive dashboard.
+Analyze your ChatGPT history with professional-grade AI metadata extraction and generate a beautfeature rich, interactive dashboard.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
@@ -76,6 +76,19 @@ Each analyzed conversation is enriched with an `llm_meta` section containing:
 *   **No Tracking**: This tool has no analytics or external reporting.
 *   **Protected**: The `.gitignore` is pre-configured to ensure no JSON exports or `.env` files are ever committed.
 
+
+## Motivation (hooman written)
+So it's always a struggle to find something in ChatGPT chats (using search in their app). Imagine you need a formula from research you have done months ago. Or banger GTM idea you have written to chat at 2 am random Thursday. You know that it is there, but oh man it takes time and grind to find it. Especially if you have thousands of chats.That is why an idea of building a good search over the chats has been around with me; you know - proper SOTA agentic search. 
+
+For a good search you need to build the metadata layer over chats. I've decided to do it two fold:
+1) deterministic - unroll/ module
+2) LLM infused - metadater/prompt.md & Gemini 3 Flash 
+
+It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes.
+
+In the nearest future I will continue to tinker on the agentic search for chats thingy. So this repo is likely to be on steroids soon.
+
 ## 📄 License
 
 MIT
+

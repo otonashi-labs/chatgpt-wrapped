@@ -81,7 +81,7 @@ class LLMClient:
             self._rate_limit()
             
             try:
-                with httpx.Client(timeout=300.0) as client:  # 5 min for large conversations
+                with httpx.Client(timeout=120.0) as client:  # 2 min max
                     response = client.post(
                         f"{self.base_url}/chat/completions",
                         headers=headers,
