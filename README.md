@@ -39,12 +39,14 @@ The pipeline is designed to handle thousands of conversations with high precisio
 
 ### 1. Unroll (`unroller/`)
 Splits your monolithic `conversations.json` (often hundreds of MBs) into manageable, monthly-organized files. It also performs initial enrichment:
+*   **Command**: `python unroller/unroll.py data/conversations/conversations.json`
 *   Calculates token counts and word counts.
 *   Extracts message duration and primary model used.
 *   Identifies voice-mode conversations and media attachments.
 
 ### 2. Infuse Metadata (`metadater/`)
 The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversation against a custom 10-domain taxonomy:
+*   **Command**: `python metadater/metadate.py`
 *   **Taxonomy**: Categorizes conversations into domains like `problem_solving`, `creation`, `learning`, `technical_deep`, etc.
 *   **Scores (0-100)**: Extracts metrics for Future Relevance, Complexity, Urgency, and even your "Alignment Score" (how polite you are to the AI).
 *   **Entities**: Identifies people, companies, technologies, and concepts discussed.
@@ -52,6 +54,26 @@ The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversa
 
 ### 3. Generate Wrapped (`wrapped/`)
 Aggregates all metadata into a unified statistics engine and produces a standalone, interactive HTML dashboard using TypeScript and modern web components.
+*   **Commands**:
+    ```bash
+    python wrapped/aggregate.py
+    cd wrapped && bun run generate
+    ```
+
+---
+
+## 🫦 Motivation (hooman written)
+So it's always a struggle to find something in ChatGPT chats.
+
+Imagine you need a formula from research you have done months ago. Or banger GTM idea you have written to chat at 2 am random Thursday. You know that it is there, but oh man it takes time and grind to find it. Especially if you have thousands of chats. That is why an idea of building a good search over the chats has been around with me; you know - proper SOTA agentic search. 
+
+For a good search you need to build the metadata layer over chats. I've decided to do it two fold:
+1) deterministic - unroll/ module
+2) LLM infused - metadater/prompt.md & Gemini 3 Flash 
+
+It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - as a random side quest.
+
+Thpough in the nearest future I will continue to tinker on the agentic search for chats thingy. So this repo is likely to be on steroids soon. And the metadata you will build - could be reused for the proper search. 
 
 ---
 
@@ -75,20 +97,6 @@ Each analyzed conversation is enriched with an `llm_meta` section containing:
 *   **Local Processing**: Your raw data never leaves your machine except for the metadata extraction request sent to the LLM.
 *   **No Tracking**: This tool has no analytics or external reporting.
 *   **Protected**: The `.gitignore` is pre-configured to ensure no JSON exports or `.env` files are ever committed.
-
-
-## Motivation (hooman written)
-So it's always a struggle to find something in ChatGPT chats.
-
-Imagine you need a formula from research you have done months ago. Or banger GTM idea you have written to chat at 2 am random Thursday. You know that it is there, but oh man it takes time and grind to find it. Especially if you have thousands of chats.That is why an idea of building a good search over the chats has been around with me; you know - proper SOTA agentic search. 
-
-For a good search you need to build the metadata layer over chats. I've decided to do it two fold:
-1) deterministic - unroll/ module
-2) LLM infused - metadater/prompt.md & Gemini 3 Flash 
-
-It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes.
-
-In the nearest future I will continue to tinker on the agentic search for chats thingy. So this repo is likely to be on steroids soon.
 
 ## 📄 License
 
