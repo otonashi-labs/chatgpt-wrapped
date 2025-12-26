@@ -19,7 +19,8 @@ from statistics import mean, stdev, median
 from typing import Any
 
 # Configuration
-WMETA_DIR = Path(__file__).parent.parent / "data" / "wmeta"
+# Configuration
+WMETA_DIR = Path(__file__).parent.parent / "data" / "wmeta" / "conversations"
 OUTPUT_FILE = Path(__file__).parent.parent / "data" / "stats" / "stats.json"
 
 
