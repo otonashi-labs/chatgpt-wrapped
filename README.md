@@ -8,6 +8,8 @@ Analyze your ChatGPT history with industrial-grade LLM metadata extraction and g
 
 ![Overview](images/overview.png)
 
+![Distributions](images/distribution-1.png)
+
 ## 🚀 Quick Start
 
 1.  **Export Data**: Go to ChatGPT Settings → Data Controls → Export Data. You'll receive an email with a zip file with images, voices and a lot of stuff there. You need to locate `conversations.json`
