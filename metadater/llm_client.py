@@ -1,10 +1,11 @@
 """
-LLM client for OpenRouter API with retry logic.
+LLM client for OpenRouter API with retry logic and async support.
 """
 
 import json
 import time
 import httpx
+import asyncio
 from typing import Any
 
 from config import (
@@ -40,25 +41,50 @@ class LLMClient:
         if elapsed < DELAY_BETWEEN_REQUESTS:
             time.sleep(DELAY_BETWEEN_REQUESTS - elapsed)
         self.last_request_time = time.time()
-    
-    def complete(
+
+    async def _async_rate_limit(self):
+        """Minimal delay between requests (async)."""
+        elapsed = time.time() - self.last_request_time
+        if elapsed < DELAY_BETWEEN_REQUESTS:
+            await asyncio.sleep(DELAY_BETWEEN_REQUESTS - elapsed)
+        self.last_request_time = time.time()
+
+    def _parse_response(self, raw_content: str, usage: dict) -> dict:
+        """Helper to parse LLM response JSON."""
+        try:
+            content = raw_content.strip()
+            if content.startswith("```"):
+                # Remove markdown code blocks
+                lines = content.split("\n")
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines and lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                content = "\n".join(lines).strip()
+            
+            data = json.loads(content)
+            return {
+                "success": True,
+                "data": data,
+                "raw": raw_content,
+                "usage": usage,
+            }
+        except json.JSONDecodeError as e:
+            return {
+                "success": False,
+                "error": f"JSON parse error: {e}",
+                "raw": raw_content,
+                "usage": usage,
+            }
+
+    async def complete_async(
         self,
         system_prompt: str,
         user_prompt: str,
         temperature: float = 0.1,
         max_tokens: int = 2000,
     ) -> dict[str, Any]:
-        """
-        Send a completion request and return parsed JSON response.
-        Includes retry logic with exponential backoff for rate limits.
-        
-        Returns dict with:
-          - success: bool
-          - data: parsed JSON (if success)
-          - error: error message (if failed)
-          - raw: raw response text
-          - usage: token usage stats
-        """
+        """Async completion request with retry logic."""
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -76,79 +102,85 @@ class LLMClient:
         }
         
         last_error = None
-        
         for attempt in range(MAX_RETRIES + 1):
-            self._rate_limit()
+            await self._async_rate_limit()
             
             try:
-                with httpx.Client(timeout=120.0) as client:  # 2 min max
-                    response = client.post(
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    response = await client.post(
                         f"{self.base_url}/chat/completions",
                         headers=headers,
                         json=payload,
                     )
                     
-                    # Handle rate limiting with retry
                     if response.status_code == 429:
                         if attempt < MAX_RETRIES:
                             wait_time = RETRY_BACKOFF ** (attempt + 1)
-                            time.sleep(wait_time)
+                            await asyncio.sleep(wait_time)
                             continue
-                        else:
-                            return {
-                                "success": False,
-                                "error": f"Rate limited after {MAX_RETRIES} retries",
-                                "raw": None,
-                                "usage": {},
-                            }
+                        return {"success": False, "error": "Rate limited", "usage": {}}
                     
                     response.raise_for_status()
                     
                 result = response.json()
                 raw_content = result["choices"][0]["message"]["content"]
                 usage = result.get("usage", {})
-                
-                # Parse JSON from response
-                try:
-                    # Try to extract JSON if wrapped in markdown
-                    content = raw_content.strip()
-                    if content.startswith("```"):
-                        # Remove markdown code blocks
-                        lines = content.split("\n")
-                        content = "\n".join(lines[1:-1])
-                    
-                    data = json.loads(content)
-                    return {
-                        "success": True,
-                        "data": data,
-                        "raw": raw_content,
-                        "usage": usage,
-                    }
-                except json.JSONDecodeError as e:
-                    return {
-                        "success": False,
-                        "error": f"JSON parse error: {e}",
-                        "raw": raw_content,
-                        "usage": usage,
-                    }
-                    
-            except httpx.HTTPStatusError as e:
-                last_error = f"HTTP error: {e.response.status_code} - {e.response.text}"
-                if attempt < MAX_RETRIES and e.response.status_code in (429, 500, 502, 503, 504):
-                    wait_time = RETRY_BACKOFF ** (attempt + 1)
-                    time.sleep(wait_time)
-                    continue
+                return self._parse_response(raw_content, usage)
                     
             except Exception as e:
-                last_error = f"Request error: {str(e)}"
+                last_error = str(e)
                 if attempt < MAX_RETRIES:
-                    wait_time = RETRY_BACKOFF ** (attempt + 1)
-                    time.sleep(wait_time)
+                    await asyncio.sleep(RETRY_BACKOFF ** (attempt + 1))
                     continue
         
-        return {
-            "success": False,
-            "error": last_error or "Unknown error after retries",
-            "raw": None,
-            "usage": {},
+        return {"success": False, "error": last_error, "usage": {}}
+
+    def complete(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        temperature: float = 0.1,
+        max_tokens: int = 2000,
+    ) -> dict[str, Any]:
+        """Synchronous completion request."""
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/metadater",
         }
+        
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }
+        
+        last_error = None
+        for attempt in range(MAX_RETRIES + 1):
+            self._rate_limit()
+            try:
+                with httpx.Client(timeout=120.0) as client:
+                    response = client.post(
+                        f"{self.base_url}/chat/completions",
+                        headers=headers,
+                        json=payload,
+                    )
+                    if response.status_code == 429 and attempt < MAX_RETRIES:
+                        time.sleep(RETRY_BACKOFF ** (attempt + 1))
+                        continue
+                    response.raise_for_status()
+                    
+                result = response.json()
+                raw_content = result["choices"][0]["message"]["content"]
+                usage = result.get("usage", {})
+                return self._parse_response(raw_content, usage)
+            except Exception as e:
+                last_error = str(e)
+                if attempt < MAX_RETRIES:
+                    time.sleep(RETRY_BACKOFF ** (attempt + 1))
+                    continue
+        return {"success": False, "error": last_error, "usage": {}}

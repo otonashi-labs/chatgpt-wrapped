@@ -1,31 +1,26 @@
 #!/usr/bin/env python3
 """
-ChatGPT Conversation Metadater v2
+ChatGPT Conversation Metadater v2 (Async version)
 
-Enriches unrolled conversations with LLM-extracted metadata.
-Uses Gemini 3 Flash Preview via OpenRouter with 0-100 scoring scales.
-
-Usage:
-    python metadate.py                           # Process all from default dirs
-    python metadate.py --input ../unrolled/conversations --output ../wmeta_2/conversations
-    python metadate.py --limit 5                 # Process only first 5
-    python metadate.py --month 12-2025           # Process specific month
-    python metadate.py --file path/to/conv.json  # Process single file
+Enriches unrolled conversations with LLM-extracted metadata using Gemini 3 Flash.
+Processes conversations in parallel (default: 10 at a time).
 """
 
 import json
 import argparse
+import asyncio
 from pathlib import Path
 from datetime import datetime
+from typing import Any
 
 from config import DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR
 from llm_client import LLMClient
-from extractor import extract_metadata, enrich_conversation
+from extractor import extract_metadata, enrich_conversation, extract_conversation_text
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Enrich ChatGPT conversations with LLM-extracted metadata"
+        description="Enrich ChatGPT conversations with LLM-extracted metadata (Async)"
     )
     parser.add_argument(
         "--input",
@@ -55,10 +50,10 @@ def parse_args():
         help="Limit number of conversations to process"
     )
     parser.add_argument(
-        "--skip-existing",
-        action="store_true",
-        default=True,
-        help="Skip files that already exist in output (default: True)"
+        "--concurrency",
+        type=int,
+        default=10,
+        help="Number of concurrent requests (default: 10)"
     )
     parser.add_argument(
         "--force",
@@ -73,20 +68,16 @@ def parse_args():
     return parser.parse_args()
 
 
-def find_conversations(
-    input_dir: Path,
-    month: str | None = None,
-) -> list[Path]:
+def find_conversations(input_dir: Path, month: str | None = None) -> list[Path]:
     """Find all conversation JSON files to process."""
-    conversations = []
-    
     if month:
         month_dir = input_dir / month
         if month_dir.exists():
             conversations = list(month_dir.glob("*.json"))
+        else:
+            conversations = []
     else:
         conversations = list(input_dir.glob("**/*.json"))
-    
     return sorted(conversations)
 
 
@@ -96,65 +87,78 @@ def get_output_path(input_path: Path, input_dir: Path, output_dir: Path) -> Path
     return output_dir / relative
 
 
-def process_file(
+async def process_file_async(
     input_path: Path,
     output_path: Path,
     client: LLMClient,
+    semaphore: asyncio.Semaphore,
     dry_run: bool = False,
+    index: int = 0,
+    total: int = 0,
 ) -> dict:
-    """
-    Process a single conversation file.
-    
-    Returns:
-        Dict with status and details
-    """
-    # Read input
-    with open(input_path, "r", encoding="utf-8") as f:
-        conv = json.load(f)
-    
-    if dry_run:
+    """Process a single conversation file asynchronously."""
+    async with semaphore:
+        # Read input
+        try:
+            with open(input_path, "r", encoding="utf-8") as f:
+                conv = json.load(f)
+        except Exception as e:
+            return {"status": "error", "input": str(input_path), "error": f"Read error: {e}"}
+
+        if dry_run:
+            return {
+                "status": "dry_run",
+                "input": str(input_path),
+                "title": conv.get("title", "Untitled"),
+            }
+
+        print(f"  → [{index}/{total}] Processing: {input_path.name}...", end="\r")
+
+        # Use extractor logic but async
+        from extractor import load_system_prompt, build_user_prompt
+        
+        conv_text = extract_conversation_text(conv)
+        MAX_CHARS = 500_000
+        if len(conv_text) > MAX_CHARS:
+            conv_text = conv_text[:MAX_CHARS] + "\n\n[CONVERSATION TRUNCATED]"
+            
+        system_prompt = load_system_prompt()
+        user_prompt = build_user_prompt(conv_text)
+        
+        result = await client.complete_async(system_prompt, user_prompt)
+
+        if not result["success"]:
+            print(f"  ✗ [{index}/{total}] Error processing {input_path.name}: {result['error'][:50]}")
+            return {
+                "status": "error",
+                "input": str(input_path),
+                "error": result["error"],
+                "usage": result.get("usage", {}),
+            }
+
+        # Enrich and save
+        enriched = enrich_conversation(conv, result["data"])
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(enriched, f, indent=2, ensure_ascii=False)
+
+        relevance = result["data"].get("inferred_future_relevance_score", 0)
+        print(f"  ✓ [{index}/{total}] {conv.get('title', 'Untitled')[:50]} [rel:{relevance}]" + " " * 20)
+        
         return {
-            "status": "dry_run",
+            "status": "success",
             "input": str(input_path),
             "output": str(output_path),
             "title": conv.get("title", "Untitled"),
+            "relevance": relevance,
+            "usage": result["usage"],
         }
-    
-    # Extract metadata
-    result = extract_metadata(conv, client)
-    
-    if not result["success"]:
-        return {
-            "status": "error",
-            "input": str(input_path),
-            "error": result["error"],
-            "usage": result.get("usage", {}),
-        }
-    
-    # Enrich and save
-    enriched = enrich_conversation(conv, result["metadata"])
-    
-    # Create output directory
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    # Write output
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(enriched, f, indent=2, ensure_ascii=False)
-    
-    return {
-        "status": "success",
-        "input": str(input_path),
-        "output": str(output_path),
-        "title": conv.get("title", "Untitled"),
-        "relevance": result["metadata"].get("inferred_future_relevance_score", 0),
-        "usage": result["usage"],
-    }
 
 
-def main():
+async def main_async():
     args = parse_args()
     
-    # Resolve paths relative to script location
     script_dir = Path(__file__).parent
     input_dir = args.input if args.input.is_absolute() else script_dir / args.input
     output_dir = args.output if args.output.is_absolute() else script_dir / args.output
@@ -162,72 +166,48 @@ def main():
     print(f"📂 Input: {input_dir}")
     print(f"📂 Output: {output_dir}")
     
-    # Handle single file mode
     if args.file:
-        file_path = args.file if args.file.is_absolute() else script_dir / args.file
-        if not file_path.exists():
-            print(f"❌ File not found: {file_path}")
-            return 1
-        
-        conversations = [file_path]
-        # For single file, output to same structure
-        input_dir = file_path.parent.parent  # Go up from month folder
+        conversations = [args.file if args.file.is_absolute() else script_dir / args.file]
+        input_dir = conversations[0].parent.parent
     else:
         conversations = find_conversations(input_dir, args.month)
     
     if not conversations:
         print("❌ No conversations found")
         return 1
-    
-    # Apply limit
+        
     if args.limit:
         conversations = conversations[:args.limit]
-    
-    print(f"📊 Found {len(conversations)} conversations to process")
-    
-    if args.dry_run:
-        print("\n🔍 DRY RUN - No API calls will be made\n")
-    
-    # Initialize client
-    client = LLMClient() if not args.dry_run else None
-    
-    # Track stats
-    stats = {
-        "processed": 0,
-        "skipped": 0,
-        "errors": 0,
-        "total_tokens": 0,
-    }
-    
-    # Process each file
-    for i, conv_path in enumerate(conversations):
-        output_path = get_output_path(conv_path, input_dir, output_dir)
         
-        # Skip existing
+    print(f"📊 Found {len(conversations)} conversations to process (Concurrency: {args.concurrency})")
+    
+    client = LLMClient() if not args.dry_run else None
+    semaphore = asyncio.Semaphore(args.concurrency)
+    
+    tasks = []
+    stats = {"processed": 0, "skipped": 0, "errors": 0, "total_tokens": 0}
+    
+    for i, conv_path in enumerate(conversations, 1):
+        output_path = get_output_path(conv_path, input_dir, output_dir)
         if not args.force and output_path.exists():
             stats["skipped"] += 1
             continue
+            
+        tasks.append(process_file_async(conv_path, output_path, client, semaphore, args.dry_run, i, len(conversations)))
         
-        # Process
-        print(f"  → [{i+1}/{len(conversations)}] Processing: {conv_path.name}...", end="\r")
-        result = process_file(conv_path, output_path, client, args.dry_run)
-        
+    if not tasks:
+        print("\n✅ All files already processed (use --force to re-process)")
+        return 0
+
+    results = await asyncio.gather(*tasks)
+    
+    for result in results:
         if result["status"] == "success":
             stats["processed"] += 1
-            usage = result.get("usage", {})
-            stats["total_tokens"] += usage.get("total_tokens", 0)
-            
-            relevance = result.get("relevance", 0)
-            print(f"  ✓ [{i+1}/{len(conversations)}] {result['title'][:50]} [rel:{relevance}]" + " " * 20)
-            
+            stats["total_tokens"] += result.get("usage", {}).get("total_tokens", 0)
         elif result["status"] == "error":
             stats["errors"] += 1
-            print(f"  ✗ [{i+1}/{len(conversations)}] {conv_path.name}: {result['error'][:50]}")
             
-        elif result["status"] == "dry_run":
-            print(f"  📋 [{i+1}/{len(conversations)}] {result['title'][:50]}")
-    
-    # Summary
     print(f"\n✅ Done!")
     print(f"   Processed: {stats['processed']}")
     print(f"   Skipped: {stats['skipped']}")
@@ -238,5 +218,4 @@ def main():
 
 
 if __name__ == "__main__":
-    exit(main())
-
+    asyncio.run(main_async())

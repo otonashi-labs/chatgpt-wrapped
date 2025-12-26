@@ -21,8 +21,9 @@ Analyze your ChatGPT history with industrial-grade LLM metadata extraction and g
     ```
 5.  **Run Pipeline**:
     ```bash
-    python run.py
+    python run.py --concurrency 10
     ```
+    *(Concurrency of 10 processes ~100 chats in 1-2 minutes)*
 6.  **View Dashboard**:
     *   Open `wrapped/wrapped.html` directly in your browser.
     *   **Or** run a local dev server for live viewing:
@@ -86,6 +87,7 @@ Each analyzed conversation is enriched with an `llm_meta` section containing:
 
 ### Pipeline Performance
 *   **Gemini 3 Flash**: Chosen for its massive 1M token context window and low cost.
+*   **Concurrency**: Optimized for speed with parallel async requests. A concurrency of 10 can process approximately 100 conversations every 1-2 minutes.
 *   **Cost Estimate**: Processing ~1,500 conversations typically costs between $5-7 USD via OpenRouter. 
 
 ---

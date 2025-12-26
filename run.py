@@ -7,6 +7,7 @@ Orchestrates the full pipeline: unroll -> metadate -> aggregate -> generate
 import os
 import subprocess
 import sys
+import argparse
 from pathlib import Path
 
 def run_cmd(cmd, cwd=None):
@@ -17,6 +18,10 @@ def run_cmd(cmd, cwd=None):
         sys.exit(1)
 
 def main():
+    parser = argparse.ArgumentParser(description="ChatGPT Wrapped 2025 Pipeline")
+    parser.add_argument("--concurrency", type=int, default=10, help="Number of parallel AI requests (default: 10)")
+    args = parser.parse_args()
+
     root_dir = Path(__file__).parent
     data_dir = root_dir / "data"
     conv_json = data_dir / "conversations" / "conversations.json"
@@ -33,8 +38,9 @@ def main():
 
     # 3. Metadate
     print("\n--- STEP 2: Enriching with metadata (AI processing) ---")
+    print(f"Using concurrency: {args.concurrency}")
     print("This step requires OPENROUTER_API_KEY in your .env file.")
-    run_cmd([sys.executable, "metadater/metadate.py"], cwd=root_dir)
+    run_cmd([sys.executable, "metadater/metadate.py", "--concurrency", str(args.concurrency)], cwd=root_dir)
 
     # 4. Aggregate
     print("\n--- STEP 3: Aggregating statistics ---")
