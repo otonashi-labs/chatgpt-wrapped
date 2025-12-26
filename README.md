@@ -44,7 +44,7 @@ For a good search you need to build the metadata layer over chats. I've decided 
 1) deterministic - unroll/ module
 2) LLM infused - metadater/prompt.md & Gemini 3 Flash 
 
-It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest.
+It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest. Maybe in some near future - full agentic search thingy will be released here as well.
 
 ---
 
