@@ -17,6 +17,7 @@ And more!
 ## 🚀 Quick Start
 
 > **Note**: This implementation currently supports **OpenRouter** only for metadata extraction.
+> **Note**: The pipeline handles **all your history since launch (May 2023)**, automatically generating multi-year heatmaps and timelines.
 
 1.  **Export Data**: Go to ChatGPT Settings → Data Controls → Export Data. You'll receive an email with a zip file with images, voices and a lot of stuff there. You need to locate `conversations.json`
 2.  **Prepare Folder**: Place the extracted `conversations.json` into `data/conversations/`.
@@ -59,6 +60,8 @@ It ended up being good metadata. And once it was sorted I've realized that it's 
 Maybe in some near future - full agentic search thingy will be released here as well. I am currently tinkering on it. In the direction of a proper "Second Brain".
 
 If you’re into personal knowledge tooling / retrieval / evaluation / agentic search: I’d love issues, PRs, and wild ideas. 
+
+**ALSO:** I will be very grateful for the feedback on metadata and indexing. How to make it better? How to make the important conversations to "surface" even more?
 
 ---
 
@@ -131,11 +134,16 @@ The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversa
 ```
 
 ### 3. Generate Wrapped (`wrapped/`)
-Aggregates all metadata into a unified statistics engine and produces a standalone, interactive HTML dashboard using TypeScript and modern web components.
-*   **Commands**:
+Aggregates all metadata into a unified statistics engine and produces a feature-rich dashboard. There are two ways to use it:
+
+*   **Static Mode**: Generates a standalone, interactive `wrapped.html` file that you can open anywhere.
     ```bash
     python wrapped/aggregate.py
     cd wrapped && bun run generate
+    ```
+*   **Live Mode**: Runs a local development server for a more dynamic experience.
+    ```bash
+    cd wrapped && bun run dev
     ```
 
 ---

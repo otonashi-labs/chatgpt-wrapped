@@ -11,7 +11,8 @@ export function formatNumber(n: number): string {
 export function formatMonth(month: string): string {
   const [year, m] = month.split("-");
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return months[parseInt(m) - 1] || month;
+  const monthName = months[parseInt(m) - 1] || m;
+  return `${monthName} ${year}`;
 }
 
 export function formatFullMonth(month: string): string {

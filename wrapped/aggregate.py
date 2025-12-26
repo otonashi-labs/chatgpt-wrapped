@@ -21,41 +21,36 @@ from typing import Any
 # Configuration
 WMETA_DIR = Path(__file__).parent.parent / "data" / "wmeta"
 OUTPUT_FILE = Path(__file__).parent.parent / "data" / "stats" / "stats.json"
-YEAR_FILTER = 2025
 
 
 def load_all_conversations() -> list[dict]:
-    """Load all conversations from wmeta_2 directory."""
+    """Load all conversations from wmeta directory."""
     conversations = []
     
     for month_dir in sorted(WMETA_DIR.iterdir()):
         if not month_dir.is_dir():
             continue
         
-        # Filter to only 2025 months
-        parts = month_dir.name.split("-")
-        if len(parts) == 2:
-            month, year = parts
-            if year != "2025":
-                continue
-        
+        # Folder format is MM-YYYY
         for file in month_dir.glob("*.json"):
             try:
                 with open(file, "r", encoding="utf-8") as f:
                     conv = json.load(f)
                     
-                # Filter to 2025 conversations only
-                created_at = conv.get("timestamps", {}).get("created_at", "")
-                if created_at:
-                    date = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-                    if date.year == YEAR_FILTER:
-                        conversations.append(conv)
+                conversations.append(conv)
             except Exception as e:
                 print(f"Error reading {file}: {e}")
     
     # Sort by date
     conversations.sort(key=lambda c: c.get("timestamps", {}).get("created_at", ""))
-    print(f"Loaded {len(conversations)} conversations from {YEAR_FILTER}")
+    
+    if conversations:
+        first_date = conversations[0].get("timestamps", {}).get("created_at", "")
+        last_date = conversations[-1].get("timestamps", {}).get("created_at", "")
+        print(f"Loaded {len(conversations)} conversations from {first_date[:10]} to {last_date[:10]}")
+    else:
+        print("No conversations found!")
+        
     return conversations
 
 
@@ -1130,13 +1125,13 @@ def aggregate_stats(convs: list[dict]) -> dict:
         
         # Meta
         "generated_at": datetime.now().isoformat(),
-        "year": YEAR_FILTER
+        "year": get_datetime(convs[-1]).year if convs else 2025
     }
 
 
 def main():
     """Main entry point."""
-    print("🚀 Starting ChatGPT Wrapped 2025 aggregation...")
+    print("🚀 Starting ChatGPT Wrapped aggregation...")
     
     convs = load_all_conversations()
     stats = aggregate_stats(convs)

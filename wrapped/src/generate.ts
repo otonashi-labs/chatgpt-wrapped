@@ -850,7 +850,7 @@ function getStyles(): string {
     /* Model Timeline */
     .model-timeline-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
       gap: 8px;
       margin-top: 8px;
     }
@@ -885,13 +885,13 @@ function getStyles(): string {
   `;
 }
 
-function getScripts(year: number, heatmapData: string, messagesHeatmapData: string): string {
+function getScripts(years: string[], heatmapData: string, messagesHeatmapData: string): string {
   return `
     const tooltip = document.getElementById('tooltip');
-    const year = ${year};
+    const years = ${JSON.stringify(years)};
     
     // Helper function to create a heatmap
-    function createHeatmap(containerId, data, tooltipLabel) {
+    function createHeatmap(containerId, data, tooltipLabel, year) {
       const container = document.getElementById(containerId);
       if (!container) return;
       
@@ -950,16 +950,8 @@ function getScripts(year: number, heatmapData: string, messagesHeatmapData: stri
       }
     }
     
-    // Initialize conversations heatmap
-    const conversationData = ${heatmapData};
-    createHeatmap('heatmap', conversationData, 'conversations');
-    
-    // Initialize messages heatmap with clipping for better visuals
-    const messagesData = ${messagesHeatmapData};
-    createHeatmapWithClipping('messages-heatmap', messagesData, 'messages');
-    
     // Helper function to create heatmap with linear scale and clipping
-    function createHeatmapWithClipping(containerId, data, tooltipLabel) {
+    function createHeatmapWithClipping(containerId, data, tooltipLabel, year) {
       const container = document.getElementById(containerId);
       if (!container) return;
       
@@ -1027,6 +1019,15 @@ function getScripts(year: number, heatmapData: string, messagesHeatmapData: stri
         currentDate.setDate(currentDate.getDate() + 1);
       }
     }
+
+    // Initialize heatmaps for all years
+    const conversationData = ${heatmapData};
+    const messagesData = ${messagesHeatmapData};
+    
+    years.forEach(year => {
+      createHeatmap('heatmap-' + year, conversationData, 'conversations', year);
+      createHeatmapWithClipping('messages-heatmap-' + year, messagesData, 'messages', year);
+    });
     
     // Add hover tooltips for bar charts
     document.querySelectorAll('.bar-hover').forEach(bar => {
@@ -1094,6 +1095,9 @@ async function generate(): Promise<void> {
   const heatmapData = generateHeatmapData(stats.activity.daily);
   const messagesHeatmapData = generateMessagesHeatmapData(stats.activity.daily);
 
+  // Extract all years present in the data
+  const years = [...new Set(stats.activity.daily.map(d => d.date.split("-")[0]))].sort();
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1105,6 +1109,14 @@ async function generate(): Promise<void> {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     ${getStyles()}
+    .heatmap-year-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: var(--text);
+      text-align: left;
+    }
   </style>
 </head>
 <body>
@@ -1133,7 +1145,7 @@ async function generate(): Promise<void> {
   </div>
   
   <script>
-    ${getScripts(stats.year, heatmapData, messagesHeatmapData)}
+    ${getScripts(years, heatmapData, messagesHeatmapData)}
   </script>
 </body>
 </html>`;

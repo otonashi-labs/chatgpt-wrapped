@@ -10,6 +10,65 @@ import { generateBarChartSVG, generatePieChartSVG, generateQuantileViz } from ".
 import { generateDomainBars, generateSubdomainSections, generateGenericBars } from "./domainBars";
 
 export function generateOverviewSection(stats: WrappedStats, heatmapData: string): string {
+  const years = [...new Set(stats.activity.daily.map(d => d.date.split("-")[0]))].sort();
+
+  const renderHeatmapSection = (id: string, title: string, legendHtml: string) => {
+    return `
+      <div class="heatmap-section">
+        <h3>Daily <strong>${title}</strong> Heatmap</h3>
+        ${years.map(year => `
+          <div class="heatmap-year-container">
+            ${years.length > 1 ? `<div class="heatmap-year-title">${year}</div>` : ""}
+            <div class="heatmap-months">
+              <span></span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+              <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+            </div>
+            <div class="heatmap-container">
+              <div class="heatmap-weekdays">
+                <span>Mon</span>
+                <span></span>
+                <span>Wed</span>
+                <span></span>
+                <span>Fri</span>
+                <span></span>
+                <span>Sun</span>
+              </div>
+              <div class="heatmap-wrapper" style="flex: 1;">
+                <div class="heatmap" id="${id}-${year}"></div>
+              </div>
+            </div>
+          </div>
+        `).join("")}
+        <div class="heatmap-legend">
+          <span>Less</span>
+          ${legendHtml}
+          <span>More</span>
+        </div>
+      </div>
+    `;
+  };
+
+  const convLegend = `
+    <div class="cell" style="background: #ebedf0"></div>
+    <div class="cell" style="background: #9be9a8"></div>
+    <div class="cell" style="background: #40c463"></div>
+    <div class="cell" style="background: #30a14e"></div>
+    <div class="cell" style="background: #216e39"></div>
+  `;
+
+  const msgLegend = `
+    <div class="cell" style="background: #ebedf0"></div>
+    <div class="cell" style="background: #9be9a8"></div>
+    <div class="cell" style="background: #6fd486"></div>
+    <div class="cell" style="background: #40c463"></div>
+    <div class="cell" style="background: #38b258"></div>
+    <div class="cell" style="background: #30a14e"></div>
+    <div class="cell" style="background: #288843"></div>
+    <div class="cell" style="background: #216e39"></div>
+    <div class="cell" style="background: #19522c"></div>
+    <div class="cell" style="background: #000000"></div>
+  `;
+
   return `
     <!-- Section 1: Overview -->
     <section id="overview">
@@ -56,74 +115,9 @@ export function generateOverviewSection(stats: WrappedStats, heatmapData: string
         </div>
       </div>
       
-      <!-- Heatmap -->
-      <div class="heatmap-section">
-        <h3>Daily <strong>Conversations</strong> Heatmap</h3>
-        <div class="heatmap-months">
-          <span></span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-          <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-        </div>
-        <div class="heatmap-container">
-          <div class="heatmap-weekdays">
-            <span>Mon</span>
-            <span></span>
-            <span>Wed</span>
-            <span></span>
-            <span>Fri</span>
-            <span></span>
-            <span>Sun</span>
-          </div>
-          <div class="heatmap-wrapper" style="flex: 1;">
-            <div class="heatmap" id="heatmap"></div>
-          </div>
-        </div>
-        <div class="heatmap-legend">
-          <span>Less</span>
-          <div class="cell" style="background: #ebedf0"></div>
-          <div class="cell" style="background: #9be9a8"></div>
-          <div class="cell" style="background: #40c463"></div>
-          <div class="cell" style="background: #30a14e"></div>
-          <div class="cell" style="background: #216e39"></div>
-          <span>More</span>
-        </div>
-      </div>
+      ${renderHeatmapSection("heatmap", "Conversations", convLegend)}
+      ${renderHeatmapSection("messages-heatmap", "Messages", msgLegend)}
       
-      <!-- Messages Heatmap -->
-      <div class="heatmap-section">
-        <h3>Daily <strong>Messages</strong> Heatmap</h3>
-        <div class="heatmap-months">
-          <span></span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-          <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-        </div>
-        <div class="heatmap-container">
-          <div class="heatmap-weekdays">
-            <span>Mon</span>
-            <span></span>
-            <span>Wed</span>
-            <span></span>
-            <span>Fri</span>
-            <span></span>
-            <span>Sun</span>
-          </div>
-          <div class="heatmap-wrapper" style="flex: 1;">
-            <div class="heatmap" id="messages-heatmap"></div>
-          </div>
-        </div>
-        <div class="heatmap-legend">
-          <span>Less</span>
-          <div class="cell" style="background: #ebedf0"></div>
-          <div class="cell" style="background: #9be9a8"></div>
-          <div class="cell" style="background: #6fd486"></div>
-          <div class="cell" style="background: #40c463"></div>
-          <div class="cell" style="background: #38b258"></div>
-          <div class="cell" style="background: #30a14e"></div>
-          <div class="cell" style="background: #288843"></div>
-          <div class="cell" style="background: #216e39"></div>
-          <div class="cell" style="background: #19522c"></div>
-          <div class="cell" style="background: #000000"></div>
-          <span>More</span>
-        </div>
-      </div>
       <div class="tooltip" id="tooltip"></div>
     </section>
   `;
