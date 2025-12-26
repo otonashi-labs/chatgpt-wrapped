@@ -34,35 +34,6 @@ Analyze your ChatGPT history with industrial-grade LLM metadata extraction and g
 
 ---
 
-## 🏗️ How it Works
-
-The pipeline is designed to handle thousands of conversations with high precision.
-
-### 1. Unroll (`unroller/`)
-Splits your monolithic `conversations.json` (often hundreds of MBs) into manageable, monthly-organized files. It also performs initial enrichment:
-*   **Command**: `python unroller/unroll.py data/conversations/conversations.json`
-*   Calculates token counts and word counts.
-*   Extracts message duration and primary model used.
-*   Identifies voice-mode conversations and media attachments.
-
-### 2. Infuse Metadata (`metadater/`)
-The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversation against a custom 10-domain taxonomy:
-*   **Command**: `python metadater/metadate.py`
-*   **Taxonomy**: Categorizes conversations into domains like `problem_solving`, `creation`, `learning`, `technical_deep`, etc.
-*   **Scores (0-100)**: Extracts metrics for Future Relevance, Complexity, Urgency, and even your "Alignment Score" (how polite you are to the AI).
-*   **Entities**: Identifies people, companies, technologies, and concepts discussed.
-*   **Mood & Tone**: Detects your emotional state and the conversation's flow pattern.
-
-### 3. Generate Wrapped (`wrapped/`)
-Aggregates all metadata into a unified statistics engine and produces a standalone, interactive HTML dashboard using TypeScript and modern web components.
-*   **Commands**:
-    ```bash
-    python wrapped/aggregate.py
-    cd wrapped && bun run generate
-    ```
-
----
-
 ## 🫦 Motivation (hooman written)
 So it's always a struggle to find something in ChatGPT chats.
 
@@ -73,6 +44,73 @@ For a good search you need to build the metadata layer over chats. I've decided 
 2) LLM infused - metadater/prompt.md & Gemini 3 Flash 
 
 It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest.
+
+---
+
+## 🏗️ How it Works
+
+The pipeline is designed to handle thousands of conversations with high precision.
+
+### 1. Unroll (`unroller/`)
+Splits your monolithic `conversations.json` (often hundreds of MBs) into manageable, monthly-organized files. It also performs initial enrichment:
+*   **Command**: `python unroller/unroll.py data/conversations/conversations.json`
+*   **Deterministic Metadata**:
+    ```json
+    {
+      "total_messages": 12,
+      "messages_by_role": {"user": 5, "assistant": 5, "system": 2},
+      "total_tokens": 2500, // Estimated via char count
+      "user_tokens": 800,
+      "assistant_tokens": 1700,
+      "models_used": ["gpt-4o"],
+      "primary_model": "gpt-4o",
+      "duration_seconds": 120.5,
+      "duration_human": "2m 0s",
+      "word_count": 450,
+      "image_count": 0,
+      "audio_count": 0,
+      "is_voice_conversation": false
+    }
+    ```
+
+### 2. Infuse Metadata (`metadater/`)
+The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversation against a custom 10-domain taxonomy:
+*   **Command**: `python metadater/metadate.py`
+*   **LLM Metadata (llm_meta)**:
+    ```json
+    {
+      "domain": "coding", // Primary category
+      "sub_domain": "debugging", // Specific area
+      "conversation_type": "troubleshooting", // Nature of interaction
+      "user_intent": "Fixing a race condition in a Python script",
+      "request_types": ["task", "explanation"],
+      "keywords": ["race condition", "threading", "lock"], // Searchable terms
+      "entities_companies": ["OpenAI", "GitHub"],
+      "technologies": ["Python", "httpx", "asyncio"],
+      "inferred_future_relevance_score": 85, // 0-100: Value for future reference
+      "complexity_score": 70, // 0-100: Technical depth
+      "urgency_score": 40, // 0-100: Time sensitivity
+      "information_density": 90, // 0-100: Signal vs Noise
+      "depth_of_engagement": 75, // 0-100: User effort
+      "user_satisfaction_inferred": 95, // 0-100: Apparent success
+      "user_request_quality_inferred": 80, // 0-100: Prompt clarity
+      "ai_response_quality_score": 90, // 0-100: AI helpfulness
+      "serendipity_vs_power_users": 65, // 0-100: Uniqueness
+      "user_mood": "focused", // Emotional state
+      "conversation_tone": "technical", // Style of exchange
+      "conversation_flow": "iterative", // How it progressed
+      "one_line_summary": "Debugging Python asyncio race condition with threading locks",
+      "outcome_type": "task_completed"
+    }
+    ```
+
+### 3. Generate Wrapped (`wrapped/`)
+Aggregates all metadata into a unified statistics engine and produces a standalone, interactive HTML dashboard using TypeScript and modern web components.
+*   **Commands**:
+    ```bash
+    python wrapped/aggregate.py
+    cd wrapped && bun run generate
+    ```
 
 ---
 
