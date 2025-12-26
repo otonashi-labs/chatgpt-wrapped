@@ -49,6 +49,10 @@ And more!
 
 ---
 
+🤖 **AI Coding Agent?** Check out [`AI_README.md`](AI_README.md) for a technical guide on how to navigate and customize this repository.
+
+---
+
 ## 🫦 Motivation (hooman written)
 So it's always been a struggle to find something in ChatGPT chats.
 
