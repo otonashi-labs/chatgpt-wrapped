@@ -73,8 +73,6 @@ For a good search you need to build the metadata layer over chats. I've decided 
 
 It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest.
 
-Though in the nearest future I will continue to tinker on the agentic search for chats thingy. So this repo is likely to be on steroids soon. And the metadata you will build - could be reused for the proper search. 
-
 ---
 
 ## 📊 Technical Details
