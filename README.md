@@ -16,6 +16,8 @@ And Many more!
 
 ## 🚀 Quick Start
 
+> **Note**: This implementation currently supports **OpenRouter** only for metadata extraction.
+
 1.  **Export Data**: Go to ChatGPT Settings → Data Controls → Export Data. You'll receive an email with a zip file with images, voices and a lot of stuff there. You need to locate `conversations.json`
 2.  **Prepare Folder**: Place the extracted `conversations.json` into `data/conversations/`.
 3.  **Configure AI**: Copy `env.example` to `.env` and add your [OpenRouter API Key](https://openrouter.ai/keys).
@@ -57,6 +59,7 @@ It ended up being good metadata. And once it was sorted I've realized that it's 
 Maybe in some near future - full agentic search thingy will be released here as well. I am currently tinkering on it. In the direction of a proper "Second Brain".
 
 If you’re into personal knowledge tooling / retrieval / evaluation / agentic search: I’d love issues, PRs, and wild ideas. 
+
 ---
 
 ## 🏗️ What's under the hood
