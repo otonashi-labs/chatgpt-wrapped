@@ -16,8 +16,8 @@ And more!
 
 ## 🚀 Quick Start
 
-> **Note**: This implementation currently supports **OpenRouter** only for metadata extraction.
-> **Note**: The pipeline handles **all your history since launch (May 2023)**, automatically generating multi-year heatmaps and timelines.
+> **Note**: This implementation currently supports **OpenRouter** only for metadata extraction.  
+> **Note**: The pipeline handles **all your history since launch (May 2023)**, automatically generating multi-year heatmaps and timelines.  
 
 1.  **Export Data**: Go to ChatGPT Settings → Data Controls → Export Data. You'll receive an email with a zip file with images, voices and a lot of stuff there. You need to locate `conversations.json`
 2.  **Prepare Folder**: Place the extracted `conversations.json` into `data/conversations/`.
