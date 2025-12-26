@@ -52,7 +52,7 @@ Imagine you need a formula from research you have done months ago. Or banger GTM
 
 For a good search you need to build the metadata layer over chats. I've decided to do it two fold:
 1) deterministic - unroll/ module
-2) LLM infused - metadater/prompt.md & Gemini 3 Flash 
+2) LLM infused - [`metadater/prompt.md`](metadater/prompt.md) & Gemini 3 Flash 
 
 It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest. 
 
@@ -89,7 +89,7 @@ Splits your monolithic `conversations.json` (often hundreds of MBs) into managea
     ```
 
 ### 2. Infuse Metadata (`metadater/`)
-The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversation against a custom 10-domain taxonomy. Each conversation is enriched with:
+The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversation against a custom 10-domain taxonomy defined in [`metadater/config.py`](metadater/config.py). Each conversation is enriched with metadata according to the instructions in [`metadater/prompt.md`](metadater/prompt.md):
 *   **Classification**: Domain, sub-domain, conversation type, and request types.
 *   **Context**: User intent, specific keywords, and entity extraction.
 *   **Quality Metrics**: 8+ numerical scores measuring engagement and response quality.
@@ -98,28 +98,35 @@ The "brain" of the project. It uses **Gemini 3 Flash** to analyze every conversa
 **Example LLM Metadata (llm_meta)**:
 ```json
 {
-  "domain": "coding", // Primary category
-  "sub_domain": "debugging", // Specific area
-  "conversation_type": "troubleshooting", // Nature of interaction
-  "user_intent": "Fixing a race condition in a Python script",
+  "domain": "problem_solving",
+  "sub_domain": "debugging",
+  "conversation_type": "troubleshooting",
+  "user_intent": "Fixing a race condition in a Python script using asyncio and threading locks",
   "request_types": ["task", "explanation"],
-  "keywords": ["race condition", "threading", "lock"], // Searchable terms
+  "keywords": ["race condition", "threading", "lock", "asyncio", "deadlock"],
+  "entities_people": [],
   "entities_companies": ["OpenAI", "GitHub"],
+  "entities_products": ["Visual Studio Code"],
+  "entities_places": [],
   "technologies": ["Python", "httpx", "asyncio"],
-  "inferred_future_relevance_score": 85, // 0-100: Value for future reference
-  "complexity_score": 70, // 0-100: Technical depth
-  "urgency_score": 40, // 0-100: Time sensitivity
-  "information_density": 90, // 0-100: Signal vs Noise
-  "depth_of_engagement": 75, // 0-100: User effort
-  "user_satisfaction_inferred": 95, // 0-100: Apparent success
-  "user_request_quality_inferred": 80, // 0-100: Prompt clarity
-  "ai_response_quality_score": 90, // 0-100: AI helpfulness
-  "serendipity_vs_power_users": 65, // 0-100: Uniqueness
-  "user_mood": "focused", // Emotional state
-  "conversation_tone": "technical", // Style of exchange
-  "conversation_flow": "iterative", // How it progressed
+  "concepts": ["Concurrency Control", "Mutual Exclusion"],
+  "inferred_future_relevance_score": 85,
+  "urgency_score": 40,
+  "complexity_score": 70,
+  "information_density": 90,
+  "depth_of_engagement": 75,
+  "user_satisfaction_inferred": 95,
+  "user_request_quality_inferred": 80,
+  "ai_response_quality_score": 90,
+  "serendipity_vs_general_public": 75,
+  "serendipity_vs_power_users": 65,
+  "conversation_flow": "iterative",
+  "user_mood": "focused",
+  "conversation_tone": "technical",
   "one_line_summary": "Debugging Python asyncio race condition with threading locks",
-  "outcome_type": "task_completed"
+  "outcome_type": "task_completed",
+  "information_direction": "collaborative",
+  "topic_tags": ["python_concurrency", "debugging_session"]
 }
 ```
 
@@ -131,7 +138,7 @@ Aggregates all metadata into a unified statistics engine and produces a standalo
     cd wrapped && bun run generate
     ```
 
-### 4. Performance & Cost
+## Performance & Cost
 *   **Gemini 3 Flash**: Chosen for its massive 1M token context window and low cost.
 *   **Concurrency**: Optimized for speed with parallel async requests. A concurrency of 10 can process approximately 100 conversations every 1-2 minutes.
 *   **Cost Estimate**: Processing ~1,500 conversations typically costs between $5-7 USD via OpenRouter. 
