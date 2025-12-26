@@ -1,10 +1,12 @@
-# ChatGPT Wrapped 2025 - DS grade
+# ChatGPT Wrapped: DS grade
 
 Analyze your ChatGPT history with industrial-grade LLM metadata extraction and generate a feature rich, interactive dashboard.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Frontend](https://img.shields.io/badge/frontend-Bun%2BTypeScript-green.svg)
+
+![Overview](images/overview.png)
 
 ## 🚀 Quick Start
 
@@ -36,7 +38,7 @@ Analyze your ChatGPT history with industrial-grade LLM metadata extraction and g
 ---
 
 ## 🫦 Motivation (hooman written)
-So it's always a struggle to find something in ChatGPT chats.
+So it's always been a struggle to find something in ChatGPT chats.
 
 Imagine you need a formula from research you have done months ago. Or banger GTM idea you have written to chat at 2 am random Thursday. You know that it is there, but oh man it takes time and grind to find it. Especially if you have thousands of chats. That is why an idea of building a good search over the chats has been around with me; you know - proper SOTA agentic search. 
 
@@ -44,7 +46,9 @@ For a good search you need to build the metadata layer over chats. I've decided 
 1) deterministic - unroll/ module
 2) LLM infused - metadater/prompt.md & Gemini 3 Flash 
 
-It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest. Maybe in some near future - full agentic search thingy will be released here as well.
+It ended up being good metadata. And once it was sorted I've realized that it's a "Wrapped season" going right now. So here it goes - nice side quest. 
+
+Maybe in some near future - full agentic search thingy will be released here as well. I am currently tinkering on it. In the direction of a proper "Second Brain".
 
 ---
 
