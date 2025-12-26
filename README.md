@@ -138,11 +138,14 @@ Aggregates all metadata into a unified statistics engine and produces a standalo
     cd wrapped && bun run generate
     ```
 
+---
+
 ## Performance & Cost
 *   **Gemini 3 Flash**: Chosen for its massive 1M token context window and low cost.
 *   **Concurrency**: Optimized for speed with parallel async requests. A concurrency of 10 can process approximately 100 conversations every 1-2 minutes.
 *   **Cost Estimate**: Processing ~1,500 conversations typically costs between $5-7 USD via OpenRouter. 
 
+---
 
 ## 🛡️ Privacy First
 
